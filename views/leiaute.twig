@@ -49,13 +49,13 @@
                         <a href="{{ app.url_generator.generate('inicio') }}">Home</a>
                     </li>
                     <li>
-                        <a href="/cliente">Cliente</a>
+                        <a href="{{ app.url_generator.generate('cadastroCliente') }}">Cliente</a>
                     </li>
                     <li>
-                        <a href="/clientes/json">Clientes JSON</a>
+                        <a href="{{ app.url_generator.generate('listaClientesJson') }}">Clientes JSON</a>
                     </li>
                     <li>
-                        <a href="/clientes/html">Clientes HTML</a>
+                        <a href="{{ app.url_generator.generate('listaClientesHtml') }}">Clientes HTML</a>
                     </li>
                 </ul>
             </div>

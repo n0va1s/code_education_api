@@ -22,14 +22,14 @@ $app->get('/cliente', function () use ($app) {
     $dados['email'] = 'emailx@gmail.com';
     $result = $app['cliente_service']->inserir($dados);
     return $app->json($result);
-});
+})->bind('cadastroCliente');
 
 $app->get('/clientes/html', function () use ($app) {
     return $app['twig']->render('cliente_lista.twig', ['clientes'=>$app['cliente_service']->listar()]);
-});
+})->bind('listaClientesHtml');
 
 $app->get('/clientes/json', function () use ($app) {
     return new Response($app->json($app['cliente_service']->listar()), 201);
-});
+})->bind('listaClientesJson');
 
 $app->run();
