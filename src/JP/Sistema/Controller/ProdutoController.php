@@ -23,24 +23,11 @@ class ProdutoController implements ControllerProviderInterface
         };
 
         $ctrl->get('/', function () use ($app) {
-            return new Response('Aqui vc pode administrar os dados do produto: <br />
-            	/incluir - apresenta o formulário de inclusão de um produto <br />
-            	/alterar/{id} - apresenta o produto do array (alterado)<br />
-                /excluir/{id} - exclui um produto do array<br />
-            	/listar - apresenta todos os clientes cadastrados em uma lista  <br /> ', 200);
+            return $app['twig']->render('produto_inicio.twig');
         })->bind('indexProduto');
 
-        $ctrl->get('/incluir', function () use ($app) {
-            $dados = array('nome' => 'Xbox 360',
-                           'descricao'=>'O último lançamento da Microsoft para jogos',
-                           'valor'=>999.97);
-            $srv = $app['produto_service'];
-            $produto = $srv->gravar($dados);
-            if (!empty($produto)) {
-                return $app->json($produto);
-            } else {
-                $app->abort(501, "Não foi possível cadastrar o produto :(");
-            }
+        $ctrl->get('/incluir', function (Request $req) use ($app) {
+            return $app['twig']->render('produto_cadastro.twig', array('produto'=>null));
         })->bind('incluirProduto');
 
         $ctrl->get('/alterar/{id}', function ($id) use ($app) {
@@ -54,6 +41,13 @@ class ProdutoController implements ControllerProviderInterface
         })->bind('alterarProduto')
         ->assert('id', '\d+');
 
+        $ctrl->post('/gravar', function (Request $req) use ($app) {
+            $dados = $req->request->all();
+            $srv = $app['produto_service'];
+            $produtos = $srv->gravar($dados);
+            return $app->redirect($app['url_generator']->generate('listarProdutoHtml'));
+        })->bind('gravarProduto');
+
         $ctrl->get('/excluir/{id}', function ($id) use ($app) {
             $srv = $app['produto_service'];
             $produtos = $srv->listar();
@@ -62,15 +56,19 @@ class ProdutoController implements ControllerProviderInterface
                 return $app->abort(500, "Não encontrei o produto {$id}");
             }
             unset($produtos[$chave]); //remove o $id
-            return $app->json($produtos);
+            return $app->redirect($app['url_generator']->generate('listarProdutoHtml'));
         })->bind('excluirProduto')
         ->assert('id', '\d+');
 
-        $ctrl->get('/listar', function () use ($app) {
+        $ctrl->get('/listar/html', function () use ($app) {
+            return $app['twig']->render('produto_lista.twig', ['produtos'=>$app['produto_service']->listar()]);
+        })->bind('listarProdutoHtml');
+
+        $ctrl->get('/listar/json', function () use ($app) {
             $srv = $app['produto_service'];
             $produtos = $srv->listar();
             return $app->json($produtos);
-        })->bind('listarProdutos');
+        })->bind('listarProdutoJson');
 
         return $ctrl;
     }

@@ -5,21 +5,17 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <div>
-                    {% if post %}
-                    <form action="{{ app.url_generator.generate('postAtualizacao', {id: post.seq_post}) }}" method="post">
+                    {% if cliente %}
+                    <form action="{{ app.url_generator.generate('gravarCliente', {id: cliente.id}) }}" method="post">
                     {% else %}
-                    <form action="{{ app.url_generator.generate('postGravacao') }}" method="post">
+                    <form action="{{ app.url_generator.generate('gravarCliente') }}" method="post">
                     {% endif %}
                         <fieldset>
                             <legend>Informe:</legend>
-                                <label for="titulo">Título:</label><br />
-                                <input type="text" id="titulo" type="text" name="desTitulo" value ="{% if post %}{{ post.des_titulo }}{% endif %}"><br />
-                                <label for="conteudo">Conteúdo:</label><br>
-                                <textarea id="conteudo" name="txtConteudo">{% if post %}{{ post.txt_conteudo }}{% endif %}</textarea><br />
-                                <label for="autor">Autor:</label><br />
-                                <input type="text" id="autor" type="text" name="nomAutor" value ="{% if post %}{{ post.nom_autor }}{% endif %}"> <br />
-                                <label for="data">Data:</label><br />
-                                <input type="date" id="data" name="datPost" value ="{% if post %}{{ post.dat_publicacao|date('d/m/Y', false) }}{% endif %}">
+                                <label for="nome">Nome:</label><br />
+                                <input type="text" id="nome" type="text" name="nomCliente" value ="{% if cliente %}{{ cliente.nome }}{% endif %}"><br />
+                                <label for="email">Email:</label><br />
+                                <input type="text" id="email" type="email" name="emlCliente" value ="{% if cliente %}{{ cliente.email }}{% endif %}"> <br />
                         </fieldset>
                         <br />
                         <input type="submit" value="Enviar">
@@ -30,7 +26,7 @@
                 <!-- Pager -->
                 <ul class="pager">
                     <li class="next">
-                        <a href="{{ app.url_generator.generate('postLista') }}">Todos os posts</a>
+                        <a href="{{ app.url_generator.generate('listarClienteHtml') }}">Todos os posts</a>
                     </li>
                 </ul>
             </div>

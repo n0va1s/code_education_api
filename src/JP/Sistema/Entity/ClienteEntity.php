@@ -2,10 +2,22 @@
 
 namespace JP\Sistema\Entity;
 
-class ClienteEntity {
+class ClienteEntity
+{
+    private $id;
+    private $nome;
+    private $email;
 
-	private $nome;
-	private $email;
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     public function getNome()
     {

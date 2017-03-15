@@ -23,30 +23,48 @@ class ClienteController implements ControllerProviderInterface
         };
 
         $ctrl->get('/', function () use ($app) {
-            return new Response('Aqui vc pode administrar os dados do cliente: <br />
-            	/cadastro/{nome} - monstra as informações de um cliente <br />
-            	/lista/html - apresenta todos os clientes cadastrados em uma lista  <br />
-            	/lista/json - apresenta todos os clientes cadastrados em formato json  <br />', 200);
+            return $app['twig']->render('cliente_inicio.twig');
         })->bind('indexCliente');
 
-        $ctrl->get('/cadastro/{nome}', function ($nome) use ($app) {
-            if (isset($nome)) {
-                $dados['nome'] = "{$nome}";
-                $dados['email'] = "{$nome}@cliente.com";
-                $result = $app['cliente_service']->inserir($dados);
-                return $app->json($result);
-            } else {
-                return $app->abort(500, "Informe um nome!");
+        $ctrl->get('/incluir', function () use ($app) {
+            return $app['twig']->render('cliente_cadastro.twig', array('cliente'=>null));
+        })->bind('incluirCliente');
+
+        $ctrl->get('/alterar/{id}', function (Request $req, $id) use ($app) {
+            $srv = $app['cliente_service'];
+            $clientes = $srv->listar();
+            $chave = array_search($id, array_column($clientes, 'id'));
+            if (!isset($chave)) {
+                return $app->abort(500, "Não encontrei o cliente {$id}");
             }
-        })->bind('cadastroCliente');
+            return $app['twig']->render('cliente_cadastro.twig', array('cliente'=>$clientes[$chave]));
+        })->bind('alterarCliente');
 
-        $ctrl->get('/lista/html', function () use ($app) {
+        $ctrl->post('/gravar', function (Request $req) use ($app) {
+            $dados = $req->request->all();
+            $srv = $app['cliente_service'];
+            $clientes = $srv->gravar($dados);
+            return $app['twig']->render('cliente_lista.twig', array('clientes'=>$clientes));
+        })->bind('gravarCliente');
+
+        $ctrl->get('/excluir/{id}', function (Request $req, $id) use ($app) {
+            $srv = $app['cliente_service'];
+            $clientes = $srv->listar();
+            $chave = array_search($id, array_column($clientes, 'id'));
+            if (!isset($chave)) {
+                return $app->abort(500, "Não encontrei o cliente {$id}");
+            }
+            unset($clientes[$chave]); //remove o $id
+            return $app['twig']->render('cliente_lista.twig', array('clientes'=>$clientes));
+        })->bind('excluirCliente');
+
+        $ctrl->get('/listar/html', function () use ($app) {
             return $app['twig']->render('cliente_lista.twig', ['clientes'=>$app['cliente_service']->listar()]);
-        })->bind('listaClientesHtml');
+        })->bind('listarClienteHtml');
 
-        $ctrl->get('/lista/json', function () use ($app) {
+        $ctrl->get('/listar/json', function () use ($app) {
             return new Response($app->json($app['cliente_service']->listar()), 201);
-        })->bind('listaClientesJson');
+        })->bind('listarClienteJson');
 
         return $ctrl;
     }
