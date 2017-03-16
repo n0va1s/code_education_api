@@ -21,7 +21,7 @@ class ClienteController implements ControllerProviderInterface
             $map = new \JP\Sistema\Mapper\ClienteMapper();
             return new \JP\Sistema\Service\ClienteService($ent, $map);
         };
-
+        //aplicacao
         $ctrl->get('/', function () use ($app) {
             return $app['twig']->render('cliente_inicio.twig');
         })->bind('indexCliente');
@@ -31,8 +31,9 @@ class ClienteController implements ControllerProviderInterface
         })->bind('incluirCliente');
 
         $ctrl->get('/alterar/{id}', function (Request $req, $id) use ($app) {
+            $dados = $req->request->all();
             $srv = $app['cliente_service'];
-            $clientes = $srv->listar();
+            $cliente = $srv->update($id, $dados);
             $chave = array_search($id, array_column($clientes, 'id'));
             if (!isset($chave)) {
                 return $app->abort(500, "Não encontrei o cliente {$id}");
@@ -43,13 +44,13 @@ class ClienteController implements ControllerProviderInterface
         $ctrl->post('/gravar', function (Request $req) use ($app) {
             $dados = $req->request->all();
             $srv = $app['cliente_service'];
-            $clientes = $srv->gravar($dados);
+            $clientes = $srv->insert($dados);
             return $app['twig']->render('cliente_lista.twig', array('clientes'=>$clientes));
         })->bind('gravarCliente');
 
         $ctrl->get('/excluir/{id}', function (Request $req, $id) use ($app) {
             $srv = $app['cliente_service'];
-            $clientes = $srv->listar();
+            $clientes = $srv->fetchall();
             $chave = array_search($id, array_column($clientes, 'id'));
             if (!isset($chave)) {
                 return $app->abort(500, "Não encontrei o cliente {$id}");
@@ -59,12 +60,46 @@ class ClienteController implements ControllerProviderInterface
         })->bind('excluirCliente');
 
         $ctrl->get('/listar/html', function () use ($app) {
-            return $app['twig']->render('cliente_lista.twig', ['clientes'=>$app['cliente_service']->listar()]);
+            return $app['twig']->render('cliente_lista.twig', ['clientes'=>$app['cliente_service']->fetchall()]);
         })->bind('listarClienteHtml');
 
         $ctrl->get('/listar/json', function () use ($app) {
-            return new Response($app->json($app['cliente_service']->listar()), 201);
+            return new Response($app->json($app['cliente_service']->fetchall()), 201);
         })->bind('listarClienteJson');
+
+        //api
+        $ctrl->get('/api/listar/json', function () use ($app) {
+            $srv = $app['cliente_service'];
+            $clientes = $srv->fetchall();
+            return $app->json($clientes);
+        })->bind('listarClienteJson');
+
+        $ctrl->get('/api/listar/{id}', function ($id) use ($app) {
+            $srv = $app['cliente_service'];
+            $clientes = $srv->fetchall();
+            $chave = array_search($id, array_column($clientes, 'id'));
+            return $app->json($clientes[$chave]);
+        })->bind('listarClienteIdJson');
+
+        $ctrl->post('/api/inserir', function (Request $req) use ($app) {
+            $dados = $req->request->all();
+            $srv = $app['cliente_service'];
+            $clientes = $srv->insert($dados);
+            return $app->json($clientes);
+        })->bind('inserirClienteJson');
+
+        $ctrl->put('/api/atualizar/{id}', function (Request $req, $id) use ($app) {
+            $dados = $req->request->all();
+            $srv = $app['cliente_service'];
+            $clientes = $srv->update($id, $dados);
+            return $app->json($clientes[$chave]);
+        })->bind('atualizarClienteJson');
+
+        $ctrl->delete('/api/apagar/{id}', function ($id) use ($app) {
+            $srv = $app['cliente_service'];
+            $clientes = $srv->delete($id);
+            return $app->json($clientes[$id]);
+        })->bind('apagarClienteJson');
 
         return $ctrl;
     }

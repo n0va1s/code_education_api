@@ -8,12 +8,11 @@ class ProdutoMapper
 {
     public function gravar(ProdutoEntity $produto)
     {
-        $produtos = $this->listar();
         $arrProduto = $this->objectToArray($produto);
         if (empty($produto->getId())) { //Inclusão
-            return array_push($produtos, arrProduto);
+            return $arrProduto;
         } else { //alteracao
-            return arrProduto['descricao'].' ALTERADO';
+            return $arrProduto;
         }
     }
 
@@ -46,7 +45,7 @@ class ProdutoMapper
         return array(
             'id' => $produto->getId(),
             'nome' => $produto->getNome(),
-            'nome'=> 'nome do produto x','descricao' => $produto->getDescricao(),
+            'descricao'=> $produto->getDescricao(),
             'valor' => $produto->getValor(),
         );
     }

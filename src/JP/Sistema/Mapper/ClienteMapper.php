@@ -8,12 +8,11 @@ class ClienteMapper
 {
     public function gravar(ClienteEntity $cliente)
     {
-        $clientes = $this->listar();
         $arrCliente = $this->objectToArray($cliente);
         if (empty($arrCliente['id'])) { //Inclusão
-            return array_push($clientes, $arrCliente);
+            return $arrCliente;
         } else { //alteracao
-            return arrCliente['nome'].' ALTERADO';
+            return $arrCliente;
         }
     }
 

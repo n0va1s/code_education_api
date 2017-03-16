@@ -16,17 +16,37 @@ class ClienteService
         $this->map = $map;
     }
 
-    public function gravar(array $dados)
+    public function insert(array $dados)
     {
-        if ($dados['id']) { //Para alteracao
-            $this->ent->setId($dados['id']);
-        }
         $this->ent->setNome($dados['nomCliente']);
-        $this->ent->setEmail($dados['emlCliente']);
-        return $this->map->gravar($this->ent);
+        $this->ent->setDescricao($dados['emlCliente']);
+        if (isset($dados['nomCliente'])&&
+            isset($dados['emlCliente'])) {
+            return $this->map->gravar($this->ent);
+        } else {
+            return array('sucess' => false, );
+        }
     }
 
-    public function listar()
+    public function update(int $id, array $dados)
+    {
+        $this->ent->setId($id);
+        $this->ent->setNome($dados['nomCliente']);
+        $this->ent->setDescricao($dados['emlCliente']);
+        if (isset($id)) {
+            return $this->map->gravar($this->ent);
+        } else {
+            return array('sucess' => false, );
+        }
+    }
+
+    public function delete(int $id)
+    {
+        $this->ent->setId($id);
+        return $this->map->excluir($this->ent);
+    }
+
+    public function fetchall()
     {
         return $this->map->listar();
     }
